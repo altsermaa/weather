@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Image from "next/image";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,11 +18,48 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const toirog = [
+    { height: "140px", width: "140px" },
+    { height: "340px", width: "340px" },
+    { height: "540px", width: "540px" },
+    { height: "940px", width: "940px" },
+  ];
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          {toirog.map((el, index) => {
+            return (
+              <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-gray-300 rounded-full"
+                style={{ height: el.height, width: el.height }}
+                key={index}
+              ></div>
+            );
+          })}
+
+          <div className="flex items-center justify-center w-[140px] h-[140px] bg-[#f2f4f6] rounded-full gap-x-4">
+            <div className="relative">
+              <div className="absolute -top-[114px] left-[67px] w-10 h-14 bg-[#f2f4f6]"></div>
+              <div className="absolute -top-[117px] left-[67px] w-20 h-16 bg-[#0F141E] rounded-bl-full"></div>
+            </div>
+
+            <div className="flex">
+              <Image src="/leftLogo.png" width={43.289} height={86} />
+            </div>
+            <div className="flex">
+              <Image src="/rightLogo.png" width={43.289} height={86} />
+            </div>
+
+            <div className="relative">
+              <div className="absolute -bottom-[114px] right-[27px] w-10 h-14 bg-[#f2f4f6]"></div>
+              <div className="absolute -bottom-[117px] right-[-13px] w-20 h-16 bg-[#0F141E] rounded-tl-full"></div>
+            </div>
+          </div>
+        </div>
         {children}
       </body>
     </html>
