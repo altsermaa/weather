@@ -1,16 +1,31 @@
+"use client";
+
 import { Box } from "./Box";
 import Image from "next/image";
 import { Search } from "lucide-react";
+import { SearchResult } from "./SearchResult";
+import { useState } from "react";
 
-export const OuterBox = ({ color, boxColor, position }) => {
+export const OuterBox = ({ color, boxColor, position, fixedData }) => {
   const textDate = "April 22, 2025";
   const textLocation = "Ulaanbaatar";
   const gradus = "26";
   const textComment = "Patchy rain nearby";
-  const circle = ["/orangeCircle.png", "/purpleCircle.png"];
 
-  const positionDay = { left: "0", top: "-48px" };
-  const positionNight = { right: "0", bottom: "-48px" };
+  const [search, setSearch] = useState("");
+
+  const searchedCity = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const result = fixedData.flatMap((el) => {
+    const filteredCities = el.filter((city) => {
+      if (city.cityName.toLowerCase().includes(search)) {
+        return true;
+      }
+    });
+    return filteredCities;
+  });
 
   return (
     <div className="flex h-screen">
@@ -19,28 +34,35 @@ export const OuterBox = ({ color, boxColor, position }) => {
         style={{ backgroundColor: "#f2f4f6" }}
       >
         <div className="relative flex w-[567px] justify-center z-10">
-          <div className="absolute right-[70px] w-full -top-16 z-30 overflow-hidden rounded-full">
-            <Search />
-            <input
-              placeholder="Search"
-              className="w-full py-4 pl-20 pr-6 outline-none text-[32px] font-bold"
-              type="text"
-            />
+          <div className="absolute right-[70px] w-full -top-16 z-30">
+            <div className="relative flex items-center w-full py-4 pl-20 pr-6 gap-4 bg-white overflow-hidden rounded-full">
+              <Search className="text-gray-400 font-bold" />
+              <input
+                placeholder="Search"
+                type="text"
+                value={search}
+                onChange={searchedCity}
+                className="outline-none text-[32px] font-bold  focus: outline-none"
+              />
+            </div>
+            {result.length !== 0 && search && (
+              <div className="w-full rounded-full mt-5">
+                <SearchResult searchName={search} result={result} />
+              </div>
+            )}
           </div>
           <Box
-            boxColor="#f2f4f6"
+            boxColor="bg-[#f2f4f6]"
             textDate={textDate}
             textLocation={textLocation}
+            textLocationColor="black"
+            centerImage="/sun.png"
+            iconColor="#4b5563"
             gradus={gradus}
             textComment={textComment}
           />
-          <div className="absolute" style={position}>
-            <Image  
-              src="/orangeCircle.png"
-              width={128}
-              height={128}
-              className="translate-x-10 translate-y-25"
-            />
+          <div className="absolute -top-48 left-0 translate-x-10 translate-y-40">
+            <Image src="/orangeCircle.png" width={128} height={128} />
           </div>
         </div>
       </div>
@@ -53,16 +75,14 @@ export const OuterBox = ({ color, boxColor, position }) => {
             boxColor="#0f151e"
             textDate={textDate}
             textLocation={textLocation}
+            textLocationColor="white"
+            centerImage="/moon.png"
+            iconColor="#d2d4d8"
             gradus={gradus}
             textComment={textComment}
           />
-          <div className="absolute" style={position}>
-            <Image
-              src="/purpleCircle.png"
-              width={128}
-              height={128}
-              className="translate-x-10 translate-y-25"
-            />
+          <div className="absolute -bottom-18 right-0 -translate-x-10 -translate-y-10">
+            <Image src="/purpleCircle.png" width={128} height={128} />
           </div>
         </div>
       </div>
