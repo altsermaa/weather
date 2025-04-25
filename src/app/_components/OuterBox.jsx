@@ -4,15 +4,18 @@ import { Box } from "./Box";
 import Image from "next/image";
 import { Search } from "lucide-react";
 import { SearchResult } from "./SearchResult";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export const OuterBox = ({ color, boxColor, position, fixedData }) => {
-  const textDate = "April 22, 2025";
-  const textLocation = "Ulaanbaatar";
-  const gradus = "26";
-  const textComment = "Patchy rain nearby";
-
+export const OuterBox = ({ fixedData }) => {
   const [search, setSearch] = useState("");
+  const [textLocation, setTextLocation] = useState("Ulan bator");
+  const [weather, setWeather] = useState({
+    textDate: "",
+    gradusDay: "",
+    gradusNight: "",
+    textComment: "",
+  });
+  const [loading, setLoading] = useState(false);
 
   const searchedCity = (e) => {
     setSearch(e.target.value);
@@ -26,6 +29,37 @@ export const OuterBox = ({ color, boxColor, position, fixedData }) => {
     });
     return filteredCities;
   });
+
+  const selectedCity = (param) => {
+    setTextLocation(param);
+    setSearch("");
+  };
+
+  useEffect(() => {
+    setLoading(true);
+
+    const fetchWeather = async () => {
+      const weatherJSON = await fetch(
+        `https://api.weatherapi.com/v1/forecast.json?key=899d9c2c0f5845838dc70138240912&q=${textLocation}`
+      );
+      const weather = await weatherJSON.json();
+
+      console.log(weather);
+
+      const data = {
+        textDate: weather?.forecast?.forecastday[0]?.date,
+        gradusDay: weather?.forecast?.forecastday[0]?.day.maxtemp_c,
+        gradusNight: weather?.forecast?.forecastday[0]?.day.mintemp_c,
+        textComment: weather?.current?.condition?.text,
+      };
+      console.log(data);
+
+      setWeather(data);
+      setLoading(false);
+    };
+
+    fetchWeather();
+  }, [textLocation]);
 
   return (
     <div className="flex h-screen">
@@ -47,19 +81,20 @@ export const OuterBox = ({ color, boxColor, position, fixedData }) => {
             </div>
             {result.length !== 0 && search && (
               <div className="w-full rounded-full mt-5">
-                <SearchResult searchName={search} result={result} />
+                <SearchResult result={result} onClick={selectedCity} />
               </div>
             )}
           </div>
           <Box
             boxColor="bg-[#f2f4f6]"
-            textDate={textDate}
+            textDate={weather.textDate}
             textLocation={textLocation}
             textLocationColor="black"
             centerImage="/sun.png"
             iconColor="#4b5563"
-            gradus={gradus}
-            textComment={textComment}
+            gradus={weather.gradusDay}
+            textComment={weather.textComment}
+            setLoading={setLoading}
           />
           <div className="absolute -top-48 left-0 translate-x-10 translate-y-40">
             <Image src="/orangeCircle.png" width={128} height={128} />
@@ -72,14 +107,14 @@ export const OuterBox = ({ color, boxColor, position, fixedData }) => {
       >
         <div className="relative flex w-[567px] justify-center z-10">
           <Box
-            boxColor="#0f151e"
-            textDate={textDate}
+            boxColor="bg-[#0f151e]"
+            textDate={weather.textDate}
             textLocation={textLocation}
             textLocationColor="white"
             centerImage="/moon.png"
             iconColor="#d2d4d8"
-            gradus={gradus}
-            textComment={textComment}
+            gradus={weather.gradusNight}
+            textComment={weather.textComment}
           />
           <div className="absolute -bottom-18 right-0 -translate-x-10 -translate-y-10">
             <Image src="/purpleCircle.png" width={128} height={128} />
